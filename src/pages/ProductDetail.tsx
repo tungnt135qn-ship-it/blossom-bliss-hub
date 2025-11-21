@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -129,6 +129,14 @@ export default function ProductDetail() {
   // Get product data
   const product = mockProducts[id as keyof typeof mockProducts] || mockProducts["1"];
 
+  // Auto-switch images
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSelectedImage((prev) => (prev + 1) % product.images.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [product.images.length]);
+
   const handleCategoryClick = (category: any) => {
     setSelectedCategory(category);
     setAccessorySelectorOpen(true);
@@ -218,144 +226,10 @@ export default function ProductDetail() {
                   -{Math.round((1 - product.price / product.originalPrice) * 100)}%
                 </Badge>
               )}
+              <Badge className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm text-foreground px-3 py-1 text-sm">
+                {selectedImage + 1}/{product.images.length}
+              </Badge>
             </div>
-            <div className="grid grid-cols-4 gap-3">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedImage(idx)}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === idx
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-transparent hover:border-primary/50"
-                  }`}
-                >
-                  <img src={img} alt={`${product.name} ${idx + 1}`} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Info */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {product.tags.map((tag, idx) => (
-                  <Badge key={idx} variant="secondary">{tag}</Badge>
-                ))}
-              </div>
-              <h1 className="text-3xl font-bold text-foreground mb-3">{product.name}</h1>
-              
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center gap-1">
-                  <Star className="w-5 h-5 fill-secondary text-secondary" />
-                  <span className="font-semibold">{product.rating}</span>
-                  <span className="text-muted-foreground">({product.reviewCount} đánh giá)</span>
-                </div>
-                <Separator orientation="vertical" className="h-6" />
-                <span className="text-muted-foreground">Đã bán: {product.soldCount}</span>
-              </div>
-
-              <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-2xl p-6 space-y-2">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-bold text-primary">
-                    {totalPrice.toLocaleString("vi-VN")}đ
-                  </span>
-                  {product.originalPrice && (
-                    <span className="text-xl text-muted-foreground line-through">
-                      {product.originalPrice.toLocaleString("vi-VN")}đ
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>Cách bạn {product.distance}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Accessories Selection */}
-            <Card className="p-5">
-              <h3 className="font-semibold text-base mb-3 flex items-center gap-2">
-                <Gift className="w-4 h-4 text-primary" />
-                Phụ kiện kèm theo
-              </h3>
-              
-              {/* Category Selection */}
-              <div className="grid grid-cols-3 gap-3 mb-4">
-                {accessoryCategories.map((category) => {
-                  const hasSelected = selectedAccessories.some(a => a.id.startsWith(category.id));
-                  return (
-                    <button
-                      key={category.id}
-                      onClick={() => handleCategoryClick(category)}
-                      className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all group ${
-                        hasSelected
-                          ? "border-primary shadow-md"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 group-hover:from-primary/20 group-hover:to-accent/20 transition-all" />
-                      <div className="relative h-full flex flex-col items-center justify-center p-3">
-                        <Gift className={`w-8 h-8 mb-2 ${hasSelected ? "text-primary" : "text-muted-foreground"}`} />
-                        <p className={`text-xs font-medium text-center ${hasSelected ? "text-primary" : "text-foreground"}`}>
-                          {category.name}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground mt-1">
-                          Từ {category.basePrice.toLocaleString("vi-VN")}đ
-                        </p>
-                      </div>
-                      {hasSelected && (
-                        <div className="absolute top-1 right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                          <Check className="w-3 h-3 text-primary-foreground" />
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Selected Accessories */}
-              {selectedAccessories.length > 0 && (
-                <div className="space-y-2 pt-3 border-t border-border">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">Đã chọn:</p>
-                  {selectedAccessories.map((accessory) => (
-                    <div 
-                      key={accessory.id}
-                      className="flex items-center justify-between p-2 bg-muted/30 rounded-lg"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">{accessory.name}</p>
-                        {accessory.message && (
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                            "{accessory.message}"
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-primary">
-                          +{accessory.price.toLocaleString("vi-VN")}đ
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 w-6 p-0"
-                          onClick={() => removeAccessory(accessory.id)}
-                        >
-                          ×
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="text-sm text-muted-foreground">Tổng phụ kiện:</span>
-                    <span className="text-sm font-bold text-primary">
-                      +{accessoriesTotal.toLocaleString("vi-VN")}đ
-                    </span>
-                  </div>
-                </div>
-              )}
-            </Card>
 
             <AccessorySelector
               open={accessorySelectorOpen}
@@ -408,12 +282,18 @@ export default function ProductDetail() {
                 </Button>
               </div>
 
-              <div className="flex gap-3">
+              <div className="grid grid-cols-4 gap-3">
                 <Button variant="outline" size="icon">
                   <Heart className="w-5 h-5" />
                 </Button>
                 <Button variant="outline" size="icon">
                   <Share2 className="w-5 h-5" />
+                </Button>
+                <Button variant="outline" size="icon">
+                  <Phone className="w-5 h-5" />
+                </Button>
+                <Button variant="outline" size="icon">
+                  <MessageCircle className="w-5 h-5" />
                 </Button>
               </div>
             </div>
@@ -439,18 +319,6 @@ export default function ProductDetail() {
                 </div>
               </div>
             </Card>
-
-            {/* Contact */}
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1">
-                <Phone className="w-4 h-4 mr-2" />
-                Gọi ngay
-              </Button>
-              <Button variant="outline" className="flex-1">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Chat
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -463,22 +331,6 @@ export default function ProductDetail() {
           </TabsList>
 
           <TabsContent value="description" className="space-y-6 mt-6">
-            <Card className="p-6">
-              <h3 className="text-xl font-bold mb-4">Thông tin chi tiết</h3>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                {product.description}
-              </p>
-              <h4 className="font-semibold mb-3">Đặc điểm nổi bật:</h4>
-              <ul className="space-y-2">
-                {product.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
             {/* Delivery Images Gallery */}
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Hình ảnh giao hoa thực tế</h3>
@@ -499,6 +351,22 @@ export default function ProductDetail() {
                   </div>
                 ))}
               </div>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-xl font-bold mb-4">Thông tin chi tiết</h3>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                {product.description}
+              </p>
+              <h4 className="font-semibold mb-3">Đặc điểm nổi bật:</h4>
+              <ul className="space-y-2">
+                {product.features.map((feature, idx) => (
+                  <li key={idx} className="flex items-start gap-2">
+                    <CheckCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
             </Card>
           </TabsContent>
 
