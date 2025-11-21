@@ -265,7 +265,10 @@ const Index = () => {
                 <AnimatedStoryChat />
               </div>
 
-              <Button className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground hover:opacity-90 w-full lg:w-auto">
+              <Button 
+                className="bg-gradient-to-r from-accent to-accent/80 text-accent-foreground hover:opacity-90 w-full lg:w-auto"
+                onClick={() => window.location.href = '/story/autumn-hanoi'}
+              >
                 Khám phá
               </Button>
             </div>
@@ -322,7 +325,10 @@ const Index = () => {
                 <AnimatedStoryChat />
               </div>
 
-              <Button className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90 w-full lg:w-auto">
+              <Button 
+                className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:opacity-90 w-full lg:w-auto"
+                onClick={() => window.location.href = '/story/winter-romance'}
+              >
                 Khám phá
               </Button>
             </div>
@@ -393,7 +399,10 @@ const Index = () => {
                 <AnimatedStoryChat />
               </div>
 
-              <Button className="bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground hover:opacity-90 w-full lg:w-auto">
+              <Button 
+                className="bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground hover:opacity-90 w-full lg:w-auto"
+                onClick={() => window.location.href = '/story/teachers-day'}
+              >
                 Xem bộ sưu tập
               </Button>
             </div>
